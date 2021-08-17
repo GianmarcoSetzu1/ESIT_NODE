@@ -30,6 +30,7 @@ app.use((req, res, next) => {
     next();
 });
 
+
 app.use('/auth', authRoutes);
 
 //app.get('/', (req, res) => res.send('My REST API!'));

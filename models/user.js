@@ -12,11 +12,9 @@ module.exports = class User {
     }
 
     static save(user) {
-        console.log("Ciao a tutti")
-        return null
-        // return db.query(
-        //     'INSERT INTO esit.users(name, email, password) VALUES ($1, $2, $3)',
-        //     [user.name, user.email, user.password]
-        // );
+        return db.query(
+             'INSERT INTO esit.users(name, email, password) VALUES ($1, $2, $3)',
+             [user.name, user.email, user.password]
+        );
     }
 }
