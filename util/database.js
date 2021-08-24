@@ -9,7 +9,7 @@ const pool = new postgres.Pool({
     password: config.password,
 });
 
-pool.query('SELECT * FROM esit.users', (err, result) => {
+pool.query('SELECT * FROM esit.users WHERE email like $1', ['user4@unica.it'], (err, result) => {
    if (err) {
         return console.error('Error executing query', err.stack)
    }
