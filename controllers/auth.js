@@ -4,10 +4,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
+const config = require('../config/admin.json');
 
 exports.signup = async (req, res, next) => {
-
-    //console.log("Message: ", req.body.name);
 
     // const errors = validationResult(req);
     //
@@ -21,7 +20,6 @@ exports.signup = async (req, res, next) => {
     const password = req.body.password;
 
     try {
-        //console.log("Message: ", "Passed");
         const hashedPassword = await bcrypt.hash(password, 12);
 
         const userDetails = {
@@ -46,25 +44,26 @@ exports.login = async (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
     try {
-        //console.log(email + ", " + User.find(email));
-        const user = await User.find(email);
-
-        console.log("Ciao" + user)
-
-        if (user[0].length !== 1) {
-            console.log("Password not equals")
-            const error = new Error('A user with this email could not be found.');
-            error.statusCode = 401;
-            throw error;
-        }
+        console.log("Email: " + email);
+        let user = null;
+        //if (email === config.email && password === config.password)
+        if (User.isAdmin(email, password))
+            user = config;
         else {
-            console.log("Ciao")
+            user = await User.find(email);
+
+            if (user === undefined) {
+                console.log("A user with this email could not be found.")
+                const error = new Error('A user with this email could not be found.');
+                error.statusCode = 401;
+                throw error;
+            }
         }
 
-        const storedUser = user[0][0];
+        const storedUser = user;//[0][0];
+        console.log(storedUser.password);
 
         //const isEqual = await bcrypt.compare(password, storedUser.password);
-
         const isEqual = await (password === storedUser.password);
 
         if (!isEqual) {
