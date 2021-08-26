@@ -81,7 +81,7 @@ exports.login = async (req, res, next) => {
             'secretfortoken',
             {expiresIn: '1h'}
         );
-        res.status(200).json({token: token, userId: storedUser.id});
+        res.status(200).json({token: token, userId: storedUser.id, userName: storedUser.name});
     } catch (err) {
         if (!err.statusCode) {
             err.statusCode = 500;
