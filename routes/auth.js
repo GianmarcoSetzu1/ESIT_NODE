@@ -6,12 +6,21 @@ const router = express.Router();
 
 const User = require('../models/user');
 
+const auth = require('../middleware/auth');
+const adminAuth = require('../middleware/adminAuth');
+
 const authController = require('../controllers/auth');
 
 
-router.post(
+router.post('/', authController.login);                     //Login screen
+
+router.get('/adminhome', adminAuth, authController.fetchAll);          //Display all users
+router.get('/adminhome/:id', adminAuth,  authController.deleteUser);    //Delete user with this id
+
+router.post(                                                    //Registration form (accessible only for admin)
     '/signup',
     [
+        adminAuth,
         body('name').trim().not().isEmpty(),
         body('email')
             .isEmail()
@@ -27,7 +36,5 @@ router.post(
     ],
     authController.signup
 );
-
-router.post('/', authController.login);
 
 module.exports = router;

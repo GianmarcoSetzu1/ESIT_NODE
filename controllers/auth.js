@@ -46,7 +46,6 @@ exports.login = async (req, res, next) => {
     try {
         console.log("Email: " + email);
         let user = null;
-        //if (email === config.email && password === config.password)
         if (User.isAdmin(email, password))
             user = config;
         else {
@@ -60,7 +59,7 @@ exports.login = async (req, res, next) => {
             }
         }
 
-        const storedUser = user;//[0][0];
+        const storedUser = user;
         console.log(storedUser.password);
 
         //const isEqual = await bcrypt.compare(password, storedUser.password);
@@ -72,7 +71,6 @@ exports.login = async (req, res, next) => {
             throw error;
         }
 
-
         const token = jwt.sign(
             {
                 email: storedUser.email,
@@ -81,11 +79,42 @@ exports.login = async (req, res, next) => {
             'secretfortoken',
             {expiresIn: '1h'}
         );
+
         res.status(200).json({token: token, userId: storedUser.id, userName: storedUser.name});
+
     } catch (err) {
         if (!err.statusCode) {
             err.statusCode = 500;
         }
         next(err);
     }
-}
+};
+
+
+exports.fetchAll = async (req, res, next) => {
+    try {
+        User.fetchAll().then((users) => {
+            res.send(users);
+        })
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+};
+
+
+exports.deleteUser = async (req, res, next) => {
+    try {
+        User.deleteUser(req.params.id);
+        User.fetchAll(req.params.id,).then((users) => {
+            res.send(users);
+        })
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+};
