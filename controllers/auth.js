@@ -108,7 +108,7 @@ exports.fetchAll = async (req, res, next) => {
 exports.deleteUser = async (req, res, next) => {
     try {
         User.deleteUser(req.params.id);
-        User.fetchAll(req.params.id,).then((users) => {
+        User.fetchAll(req.params.id).then((users) => {
             res.send(users);
         })
     } catch (err) {

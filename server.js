@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const authRoutes = require('./routes/auth');
+const buildingRoutes = require('./routes/building')
 //const User = require('./models/user');
 const errorController = require('./controllers/error');
 
@@ -30,6 +31,8 @@ app.use((req, res, next) => {
 
 
 app.use('/auth', authRoutes);
+
+app.use('/buildings', buildingRoutes);
 
 app.use(errorController.get404);
 
