@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Building = require('../models/building');
+const Shutter = require('../models/shutter');
 
 exports.findById = async (req, res, next) => {
     try {
@@ -37,6 +38,50 @@ exports.addBuilding = async (req, res, next) => {
         Building.addBuilding(req.params.userId, req.body.name, req.body.city, req.body.address, req.body.street_number);
         Building.findById(req.params.userId).then((buildings) => {
             res.send(buildings);
+        })
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+}
+
+
+
+exports.findShutterByBuilding = async (req, res, next) => {
+    try {
+        Shutter.findShutterByBuilding(req.params.buildingId).then((shutters) => {
+            res.send(shutters);
+        })
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+}
+
+exports.deleteShutter = async (req, res, next) => {
+    try {
+        Shutter.deleteShutter(req.params.id);
+        Shutter.findShutterByBuilding(req.params.building).then((shutters) => {
+            res.send(shutters);
+        })
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+};
+
+exports.addShutter = async (req, res, next) => {
+    try {
+        console.log("ADD SHUTTER");
+        Shutter.addShutter(req.params.buildingId, req.body.name, req.body.room);
+        Shutter.findShutterByBuilding(req.params.buildingId).then((shutters) => {
+            res.send(shutters);
         })
     } catch (err) {
         if (!err.statusCode) {

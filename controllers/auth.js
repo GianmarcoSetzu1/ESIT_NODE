@@ -118,3 +118,20 @@ exports.deleteUser = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.updateUser = async (req, res, next) => {
+    try {
+        if (req.body.password.length >= 7)
+            User.updateUserWPassword(req.params.id, req.body.name, req.body.email, req.body.password);
+        else
+            User.updateUser(req.params.id, req.body.name, req.body.email);
+        User.fetchAll().then((users) => {
+            res.send(users);
+        })
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+};

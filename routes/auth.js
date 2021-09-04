@@ -16,6 +16,8 @@ router.post('/', authController.login);                     //Login screen
 
 router.get('/adminhome', adminAuth, authController.fetchAll);          //Display all users
 router.get('/adminhome/:id', adminAuth,  authController.deleteUser);    //Delete user with this id
+router.post('/adminhome/:id', adminAuth, authController.updateUser);
+
 
 router.post(                                                    //Registration form (accessible only for admin)
     '/signup',

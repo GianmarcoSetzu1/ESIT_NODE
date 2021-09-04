@@ -10,6 +10,18 @@ module.exports = class User {
         this.password = password;
     }
 
+    static updateUserWPassword(id, name, email, password) {
+        return db.query('UPDATE esit.users SET name=$1, email=$2, password=$3 WHERE id = $4', [name, email, password, id])
+            .catch(e => console.error(e.stack))
+    }
+
+    static updateUser(id, name, email) {
+        return db.query('UPDATE esit.users SET name=$1, email=$2 WHERE id = $3', [name, email,id])
+            .catch(e => console.error(e.stack))
+    }
+
+
+
     static deleteUser(id) {
         return db.query('DELETE FROM esit.users WHERE id = $1', [id])
             .catch(e => console.error(e.stack))
