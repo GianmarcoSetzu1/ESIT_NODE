@@ -30,4 +30,10 @@ module.exports = class Building {
         return db.query('INSERT INTO esit.buildings(name, city, address, street_number, owner) VALUES ($1, $2, $3, $4, $5)',
             [name, city, address, street_number, userId]);
     }
+
+    static updateBuilding(buildingId, userId, name, city, address, street_number) {
+        return db.query('UPDATE esit.buildings SET name=$1, city=$2, address=$3, street_number=$4 WHERE id=$5 and owner=$6',
+            [name, city, address, street_number, buildingId, userId])
+            .catch(e => console.error(e.stack))
+    }
 }

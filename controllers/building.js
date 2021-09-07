@@ -47,7 +47,19 @@ exports.addBuilding = async (req, res, next) => {
     }
 }
 
-
+exports.updateBuilding = async (req, res, next) => {
+    try {
+        Building.updateBuilding(req.params.buildingId, req.params.userId, req.body.name, req.body.city, req.body.address, req.body.street_number);
+        Building.findById(req.params.userId).then((buildings) => {
+            res.send(buildings);
+        })
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+}
 
 exports.findShutterByBuilding = async (req, res, next) => {
     try {
@@ -80,6 +92,20 @@ exports.addShutter = async (req, res, next) => {
     try {
         console.log("ADD SHUTTER");
         Shutter.addShutter(req.params.buildingId, req.body.name, req.body.room);
+        Shutter.findShutterByBuilding(req.params.buildingId).then((shutters) => {
+            res.send(shutters);
+        })
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+}
+
+exports.updateShutter = async (req, res, next) => {
+    try {
+        Shutter.updateShutter(req.params.shutterId, req.params.buildingId, req.body.name, req.body.room);
         Shutter.findShutterByBuilding(req.params.buildingId).then((shutters) => {
             res.send(shutters);
         })

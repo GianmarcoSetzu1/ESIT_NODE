@@ -26,5 +26,11 @@ module.exports = class Building {
             [name, room, buildingId]);
     }
 
+    static updateShutter(shutterId, buildingId, name, room) {
+        return db.query('UPDATE esit.shutters SET name=$1, room=$2 WHERE id=$3 and building=$4',
+            [name, room, shutterId, buildingId])
+            .catch(e => console.error(e.stack))
+    }
+
 
 }
