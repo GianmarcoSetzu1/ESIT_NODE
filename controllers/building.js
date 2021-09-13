@@ -76,10 +76,10 @@ exports.findShutterByBuilding = async (req, res, next) => {
 
 exports.deleteShutter = async (req, res, next) => {
     try {
-        Shutter.deleteShutter(req.params.id);
-        Shutter.findShutterByBuilding(req.params.building).then((shutters) => {
-            res.send(shutters);
-        })
+         Shutter.deleteShutter(req.params.id);
+         Shutter.findShutterByBuilding(req.params.building).then((shutters) => {
+             res.send(shutters);
+         })
     } catch (err) {
         if (!err.statusCode) {
             err.statusCode = 500;
@@ -116,3 +116,15 @@ exports.updateShutter = async (req, res, next) => {
         next(err);
     }
 }
+
+exports.updateSlot = async (req, res, next) => {
+    try {
+        Shutter.updateSlot(req.params.shutterId, req.params.slot, req.params.value);
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+}
+

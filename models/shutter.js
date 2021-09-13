@@ -1,6 +1,7 @@
 const db = require("../util/database");
-module.exports = class Building {
-    constructor(name, room, building) {
+module.exports = class Shutter {
+    constructor(name, room, building, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
+                F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24) {
         this.name = name;
         this.room = room;
         this.building = building;
@@ -29,6 +30,11 @@ module.exports = class Building {
     static updateShutter(shutterId, buildingId, name, room) {
         return db.query('UPDATE esit.shutters SET name=$1, room=$2 WHERE id=$3 and building=$4',
             [name, room, shutterId, buildingId])
+            .catch(e => console.error(e.stack))
+    }
+
+    static updateSlot(shutterId, slot, value) {
+        return db.query('UPDATE esit.shutters SET ' + slot + '=$1 WHERE id=$2',[value, shutterId])
             .catch(e => console.error(e.stack))
     }
 
