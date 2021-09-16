@@ -117,9 +117,52 @@ exports.updateShutter = async (req, res, next) => {
     }
 }
 
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: MIT-0
+var awsIot = require('aws-iot-device-sdk');
+
+//
+// Replace the values of '<YourUniqueClientIdentifier>' and '<YourCustomEndpoint>'
+// with a unique client identifier and custom host endpoint provided in AWS IoT.
+// NOTE: client identifiers must be unique within your AWS account; if a client attempts
+// to connect with a client identifier which is already in use, the existing
+// connection will be terminated.
+//
+
+
+
 exports.updateSlot = async (req, res, next) => {
     try {
         Shutter.updateSlot(req.params.shutterId, req.params.slot, req.params.value);
+        var device = awsIot.device({
+            keyPath: 'C:/Users/pc/Desktop/UNICA/INFORMATICA LM-18/II Semestre/ESIT/PROGETTO SETZU FONNESU' +
+                '/cert/Chiave Privata/a00d4a5ff2dfff7b0274c39db4cb6d1243ba3a26dc15a1c832033ce4ee6c3b9e-private.pem.key',
+            certPath: 'C:/Users/pc/Desktop/UNICA/INFORMATICA LM-18/II Semestre/ESIT/PROGETTO SETZU FONNESU' +
+                '/cert/Certificato/a00d4a5ff2dfff7b0274c39db4cb6d1243ba3a26dc15a1c832033ce4ee6c3b9e-certificate.pem.crt',
+            caPath: 'C:/Users/pc/Desktop/UNICA/INFORMATICA LM-18/II Semestre/ESIT/PROGETTO SETZU FONNESU' +
+                '/cert/CAroot Amazon 1/AmazonRootCA1.pem',
+            clientId: 'bus',
+            host: 'ar7s6tjbwbv5n-ats.iot.us-west-2.amazonaws.com'
+        });
+
+        //
+        // Device is an instance returned by mqtt.Client(), see mqtt.js for full
+        // documentation.
+        //
+        device
+            .on('connect', function() {
+                console.log('connect');
+                device.subscribe('topic_1');
+                let x = String(req.params.slot)[1];
+                x = Number(x)-1;
+                var fascia = "id_fascia"+x;
+                device.publish('topic_2', JSON.stringify( {"state":{"desired":{[fascia] :  req.params.value}}}));
+            });
+
+        device
+            .on('message', function(topic, payload) {
+                console.log('message', topic, payload.toString());
+            });
     } catch (err) {
         if (!err.statusCode) {
             err.statusCode = 500;
