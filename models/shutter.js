@@ -38,5 +38,10 @@ module.exports = class Shutter {
             .catch(e => console.error(e.stack))
     }
 
+    static updateClosure(shutterId, value) {
+        return db.query('UPDATE esit.shutters SET closure=$1 WHERE id=$2',[value, shutterId])
+            .catch(e => console.error(e.stack))
+    }
+
 
 }

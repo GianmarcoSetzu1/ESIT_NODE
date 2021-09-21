@@ -23,6 +23,6 @@ router.get('/shutters/:shutterId/:slot/:value', buildingController.updateSlot);
 
 router.post('/shutters/:buildingId', buildingController.addShutter);
 router.post('/shutters/:shutterId/:buildingId', buildingController.updateShutter);
-
+router.post('/shutters/', buildingController.updateClosure);
 
 module.exports = router;
