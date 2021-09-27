@@ -140,36 +140,52 @@ exports.updateSlot = async (req, res, next) => {
         // documentation.
         //
         var device = awsIot.device({
-            keyPath: 'C:/Users/pc/Desktop/UNICA/INFORMATICA LM-18/II Semestre/ESIT/PROGETTO SETZU FONNESU' +
-                '/cert/Chiave Privata/a00d4a5ff2dfff7b0274c39db4cb6d1243ba3a26dc15a1c832033ce4ee6c3b9e-private.pem.key',
-            certPath: 'C:/Users/pc/Desktop/UNICA/INFORMATICA LM-18/II Semestre/ESIT/PROGETTO SETZU FONNESU' +
-                '/cert/Certificato/a00d4a5ff2dfff7b0274c39db4cb6d1243ba3a26dc15a1c832033ce4ee6c3b9e-certificate.pem.crt',
-            caPath: 'C:/Users/pc/Desktop/UNICA/INFORMATICA LM-18/II Semestre/ESIT/PROGETTO SETZU FONNESU' +
-                '/cert/CAroot Amazon 1/AmazonRootCA1.pem',
-            clientId: 'bus',
-            host: 'ar7s6tjbwbv5n-ats.iot.us-west-2.amazonaws.com'
+            keyPath: 'private/99e1adf37e-private.pem.key',
+            certPath: 'private/99e1adf37e-certificate.pem.crt',
+            caPath: 'private/AmazonRootCA1.pem.crt',
+            clientId: 'esit-obj1',
+            host: 'a2qk19pk2pxg5u-ats.iot.us-east-2.amazonaws.com'
         });
 
         device
-            .on('connect', function() {
-                console.log('connect');
-                device.subscribe('topic_1');
-                let x = String(req.params.slot)[1];
-                x = Number(x)-1;
-                var fascia = "id_fascia"+x;
-                device.publish('topic_2', JSON.stringify( {"state":{"desired":{[fascia] :  req.params.value}}}));
+            .on('connect', function () {
+                console.log('MQTT Connesso');
+                var fascia = "id_fascia" + req.params.slot;
+                device.publish(
+                    "$aws/things/" + req.params.shutterId + "/shadow/update",
+                    JSON.stringify({ "state": { "desired": { [fascia]: req.params.value } } }),
+                    0,
+                    function (err) {
+                        console.log('Messaggio pubblicato');
+                        device.end(); // lo disconnetto se no continua ad inviare il messaggio....
+                    }
+                );
             });
-
-        device
-            .on('message', function(topic, payload) {
-                console.log('message', topic, payload.toString());
-            });
+        res.status(200).end("OK");
     } catch (err) {
-        if (!err.statusCode) {
-            err.statusCode = 500;
-        }
-        next(err);
+        console.error("Si è verificato un errore:  ", JSON.stringify(err, null, 2));
     }
+
+    //     device
+    //         .on('connect', function() {
+    //             console.log('connect');
+    //             device.subscribe('topic_1');
+    //             let x = String(req.params.slot)[1];
+    //             x = Number(x)-1;
+    //             var fascia = "id_fascia"+x;
+    //             device.publish('topic_2', JSON.stringify( {"state":{"desired":{[fascia] :  req.params.value}}}));
+    //         });
+    //
+    //     device
+    //         .on('message', function(topic, payload) {
+    //             console.log('message', topic, payload.toString());
+    //         });
+    // } catch (err) {
+    //     if (!err.statusCode) {
+    //         err.statusCode = 500;
+    //     }
+    //     next(err);
+    // }
 }
 
 
@@ -178,31 +194,84 @@ exports.updateClosure = async (req, res, next) => {
         Shutter.updateClosure(req.body.shutterId, req.body.value);
 
         var device = awsIot.device({
-            keyPath: 'C:/Users/pc/Desktop/UNICA/INFORMATICA LM-18/II Semestre/ESIT/PROGETTO SETZU FONNESU' +
-                '/cert/Chiave Privata/a00d4a5ff2dfff7b0274c39db4cb6d1243ba3a26dc15a1c832033ce4ee6c3b9e-private.pem.key',
-            certPath: 'C:/Users/pc/Desktop/UNICA/INFORMATICA LM-18/II Semestre/ESIT/PROGETTO SETZU FONNESU' +
-                '/cert/Certificato/a00d4a5ff2dfff7b0274c39db4cb6d1243ba3a26dc15a1c832033ce4ee6c3b9e-certificate.pem.crt',
-            caPath: 'C:/Users/pc/Desktop/UNICA/INFORMATICA LM-18/II Semestre/ESIT/PROGETTO SETZU FONNESU' +
-                '/cert/CAroot Amazon 1/AmazonRootCA1.pem',
-            clientId: 'bus',
-            host: 'ar7s6tjbwbv5n-ats.iot.us-west-2.amazonaws.com'
+            keyPath: 'private/99e1adf37e-private.pem.key',
+            certPath: 'private/99e1adf37e-certificate.pem.crt',
+            caPath: 'private/AmazonRootCA1.pem.crt',
+            clientId: 'esit-obj1',
+            host: 'a2qk19pk2pxg5u-ats.iot.us-east-2.amazonaws.com'
         });
-        device
-            .on('connect', function() {
-                console.log('connect');
-                device.subscribe('topic_1');
-                device.publish('topic_2', JSON.stringify( {"state":{"desired":{ "posizione" :  req.body.value}}}));
-            });
 
         device
-            .on('message', function(topic, payload) {
-                console.log('message', topic, payload.toString());
+            .on('connect', function () {
+                console.log('MQTT Connesso');
+                device.publish(
+                    "$aws/things/" + req.params.shutterId + "/shadow/update",
+                    JSON.stringify({ "state": { "desired": { "posizione": req.body.value } } }),
+                    0,
+                    function (err) {
+                        console.log('Messaggio pubblicato');
+                        device.end(); // lo disconnetto se no continua ad inviare il messaggio....
+                    }
+                );
             });
+        res.status(200).end("OK");
     } catch (err) {
-        if (!err.statusCode) {
-            err.statusCode = 500;
-        }
-        next(err);
+        console.error("Si è verificato un errore:  ", JSON.stringify(err, null, 2));
+    }
+    //     device
+    //         .on('connect', function() {
+    //             console.log('connect');
+    //             device.subscribe('topic_1');
+    //             device.publish('topic_2', JSON.stringify( {"state":{"desired":{ "posizione" :  req.body.value}}}));
+    //         });
+    //
+    //     device
+    //         .on('message', function(topic, payload) {
+    //             console.log('message', topic, payload.toString());
+    //         });
+    // } catch (err) {
+    //     if (!err.statusCode) {
+    //         err.statusCode = 500;
+    //     }
+    //     next(err);
+    // }
+}
+
+var AWS = require("aws-sdk");
+
+AWS.config.update({
+    region: 'us-east-2',
+    accessKeyId: 'AKIAUZY37P5YNE2ISHND',
+    secretAccessKey: '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',
+    endpoint: "https://dynamodb.us-east-2.amazonaws.com"
+});
+
+
+exports.getStatus = async (req, res, next) => {
+    try {
+        var docClient = new AWS.DynamoDB.DocumentClient();
+
+        var params = {
+            TableName: "tab6",
+            KeyConditionExpression: "id_device = :idt", // attributo da usare come filtro
+            ExpressionAttributeValues: { ":idt": 'esit-obj1' /*req.params.id*/ }, // valore dell'attributo filtro
+            ScanIndexForward: false, // ordinamento in base al timestamp decrescente
+            Limit: 1, // solo un record
+            ProjectionExpression: "posizione" // attributi che vengono restituiti, è possibile eliminare quelli non usati
+        };
+
+        docClient.query(params, function (err, data) {
+            if (err) {
+                console.error("Errore da AWS: ", JSON.stringify(err, null, 2));
+                res.status(200).end(JSON.stringify(err, null, 2));
+            } else {
+                console.log("DynamoDB.DocumentClient.query succeeded: ", JSON.stringify(data.Items[0], null, 2));
+                // valori in data.Items[0] es. data.Items[0].lightval
+                res.status(200).end(JSON.stringify(data.Items[0].posizione, null, 2));
+            }
+        });
+    } catch (err) {
+        console.error("Si è verificato un errore:  ", JSON.stringify(err, null, 2));
     }
 }
 
