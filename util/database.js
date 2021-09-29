@@ -13,7 +13,6 @@ pool.query('SELECT * FROM esit.users WHERE email like $1', ['user4@unica.it'], (
    if (err) {
         return console.error('Error executing query', err.stack)
    }
-        console.log(result.rows)
 });
 
 module.exports = {

@@ -1,6 +1,4 @@
 const db = require('../util/database');
-const postgres = require("pg");
-const config = require("../config/config.json");
 const admin = require('../config/admin.json');
 
 module.exports = class User {
@@ -33,7 +31,6 @@ module.exports = class User {
             .then(res => {
                 if (res.rows.length === 0)
                     return undefined
-                console.log(res.rows);
                 return res.rows
             });
     }
@@ -44,7 +41,6 @@ module.exports = class User {
             .then(res => {
                 if (res.rows.length === 0)
                     return undefined
-                console.log(res.rows[0].name);
                 return res.rows[0]
             });
      }

@@ -1,6 +1,3 @@
-const { validationResult } = require('express-validator');
-
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
@@ -8,25 +5,15 @@ const config = require('../config/admin.json');
 
 exports.signup = async (req, res, next) => {
 
-    // const errors = validationResult(req);
-    //
-    // if (!errors.isEmpty()) {
-    //     console.log("Errori nella validazione");
-    //     return;
-    // }
-
     const name = req.body.name;
     const email = req.body.email;
     const password = req.body.password;
 
     try {
-        const hashedPassword = await bcrypt.hash(password, 12);
-
         const userDetails = {
             name: name,
             email: email,
             password: password,
-            //password: hashedPassword,
         };
 
         const result = await User.save(userDetails);
@@ -44,7 +31,6 @@ exports.login = async (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
     try {
-        console.log("Email: " + email);
         let user = null;
         if (User.isAdmin(email, password))
             user = config;
@@ -60,9 +46,7 @@ exports.login = async (req, res, next) => {
         }
 
         const storedUser = user;
-        console.log(storedUser.password);
 
-        //const isEqual = await bcrypt.compare(password, storedUser.password);
         const isEqual = await (password === storedUser.password);
 
         if (!isEqual) {

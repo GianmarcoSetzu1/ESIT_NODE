@@ -1,7 +1,3 @@
-const { validationResult } = require('express-validator');
-
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const Building = require('../models/building');
 const Shutter = require('../models/shutter');
 
@@ -34,7 +30,6 @@ exports.deleteBuilding = async (req, res, next) => {
 
 exports.addBuilding = async (req, res, next) => {
     try {
-        console.log("ADD BUILDING");
         Building.addBuilding(req.params.userId, req.body.name, req.body.city, req.body.address, req.body.street_number);
         Building.findById(req.params.userId).then((buildings) => {
             res.send(buildings);
@@ -90,7 +85,6 @@ exports.deleteShutter = async (req, res, next) => {
 
 exports.addShutter = async (req, res, next) => {
     try {
-        console.log("ADD SHUTTER");
         Shutter.addShutter(req.params.buildingId, req.body.name, req.body.room);
         Shutter.findShutterByBuilding(req.params.buildingId).then((shutters) => {
             res.send(shutters);
@@ -117,28 +111,13 @@ exports.updateShutter = async (req, res, next) => {
     }
 }
 
-// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-// SPDX-License-Identifier: MIT-0
 var awsIot = require('aws-iot-device-sdk');
-
-//
-// Replace the values of '<YourUniqueClientIdentifier>' and '<YourCustomEndpoint>'
-// with a unique client identifier and custom host endpoint provided in AWS IoT.
-// NOTE: client identifiers must be unique within your AWS account; if a client attempts
-// to connect with a client identifier which is already in use, the existing
-// connection will be terminated.
-//
-
-
-
 
 exports.updateSlot = async (req, res, next) => {
     try {
         Shutter.updateSlot(req.params.shutterId, req.params.slot, req.params.value);
-        //
         // Device is an instance returned by mqtt.Client(), see mqtt.js for full
         // documentation.
-        //
         var device = awsIot.device({
             keyPath: 'private/99e1adf37e-private.pem.key',
             certPath: 'private/99e1adf37e-certificate.pem.crt',
@@ -150,14 +129,16 @@ exports.updateSlot = async (req, res, next) => {
         device
             .on('connect', function () {
                 console.log('MQTT Connesso');
-                var fascia = "id_fascia" + req.params.slot;
+                let x = String(req.params.slot).replace('f', '');
+                x = Number(x)-1;
+                var fascia = "id_fascia"+x;
                 device.publish(
-                    "$aws/things/" + req.params.shutterId + "/shadow/update",
+                    "$aws/things/tap" + req.params.shutterId + "/shadow/update",
                     JSON.stringify({ "state": { "desired": { [fascia]: req.params.value } } }),
                     0,
                     function (err) {
                         console.log('Messaggio pubblicato');
-                        device.end(); // lo disconnetto se no continua ad inviare il messaggio....
+                        device.end(); // disconnect it to stop publications ....
                     }
                 );
             });
@@ -166,26 +147,6 @@ exports.updateSlot = async (req, res, next) => {
         console.error("Si è verificato un errore:  ", JSON.stringify(err, null, 2));
     }
 
-    //     device
-    //         .on('connect', function() {
-    //             console.log('connect');
-    //             device.subscribe('topic_1');
-    //             let x = String(req.params.slot)[1];
-    //             x = Number(x)-1;
-    //             var fascia = "id_fascia"+x;
-    //             device.publish('topic_2', JSON.stringify( {"state":{"desired":{[fascia] :  req.params.value}}}));
-    //         });
-    //
-    //     device
-    //         .on('message', function(topic, payload) {
-    //             console.log('message', topic, payload.toString());
-    //         });
-    // } catch (err) {
-    //     if (!err.statusCode) {
-    //         err.statusCode = 500;
-    //     }
-    //     next(err);
-    // }
 }
 
 
@@ -205,12 +166,12 @@ exports.updateClosure = async (req, res, next) => {
             .on('connect', function () {
                 console.log('MQTT Connesso');
                 device.publish(
-                    "$aws/things/" + req.params.shutterId + "/shadow/update",
+                    "$aws/things/tap" + req.params.shutterId + "/shadow/update",
                     JSON.stringify({ "state": { "desired": { "posizione": req.body.value } } }),
                     0,
                     function (err) {
                         console.log('Messaggio pubblicato');
-                        device.end(); // lo disconnetto se no continua ad inviare il messaggio....
+                        device.end(); // disconnect it to stop publications ....
                     }
                 );
             });
@@ -218,23 +179,7 @@ exports.updateClosure = async (req, res, next) => {
     } catch (err) {
         console.error("Si è verificato un errore:  ", JSON.stringify(err, null, 2));
     }
-    //     device
-    //         .on('connect', function() {
-    //             console.log('connect');
-    //             device.subscribe('topic_1');
-    //             device.publish('topic_2', JSON.stringify( {"state":{"desired":{ "posizione" :  req.body.value}}}));
-    //         });
-    //
-    //     device
-    //         .on('message', function(topic, payload) {
-    //             console.log('message', topic, payload.toString());
-    //         });
-    // } catch (err) {
-    //     if (!err.statusCode) {
-    //         err.statusCode = 500;
-    //     }
-    //     next(err);
-    // }
+
 }
 
 var AWS = require("aws-sdk");
@@ -253,11 +198,11 @@ exports.getStatus = async (req, res, next) => {
 
         var params = {
             TableName: "tab6",
-            KeyConditionExpression: "id_device = :idt", // attributo da usare come filtro
-            ExpressionAttributeValues: { ":idt": 'esit-obj1' /*req.params.id*/ }, // valore dell'attributo filtro
-            ScanIndexForward: false, // ordinamento in base al timestamp decrescente
-            Limit: 1, // solo un record
-            ProjectionExpression: "posizione" // attributi che vengono restituiti, è possibile eliminare quelli non usati
+            KeyConditionExpression: "id_device = :idt", // attribute as filter
+            ExpressionAttributeValues: { ":idt": "tap"+ req.params.shutterId}, // attribute filter value
+            ScanIndexForward: false, // sorting based on timestamp decreasing
+            Limit: 1, // one record
+            ProjectionExpression: "posizione" // attributes returned
         };
 
         docClient.query(params, function (err, data) {
@@ -266,8 +211,10 @@ exports.getStatus = async (req, res, next) => {
                 res.status(200).end(JSON.stringify(err, null, 2));
             } else {
                 console.log("DynamoDB.DocumentClient.query succeeded: ", JSON.stringify(data.Items[0], null, 2));
-                // valori in data.Items[0] es. data.Items[0].lightval
-                res.status(200).end(JSON.stringify(data.Items[0].posizione, null, 2));
+                if (data.Items[0] !== undefined)
+                    res.status(200).end(JSON.stringify(data.Items[0].posizione, null, 2));
+                else
+                    res.status(200).end(JSON.stringify(0, null, 2));
             }
         });
     } catch (err) {

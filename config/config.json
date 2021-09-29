@@ -1,8 +1,7 @@
 {
-  /*"host": "localhost",*/
-  "host" : "127.0.0.1",
+  "host" : "localhost",
   "user": "postgres",
   "database": "postgres",
-  "password" : "postgres!"
-  /*"password": "Goleiro1!"*/
+  "password" : "Goleiro1!"
 }
+

@@ -1,14 +1,8 @@
 const express = require('express');
-
 const { body } = require('express-validator');
-
 const router = express.Router();
-
 const User = require('../models/user');
-
-const auth = require('../middleware/auth');
 const adminAuth = require('../middleware/adminAuth');
-
 const authController = require('../controllers/auth');
 
 
@@ -17,7 +11,6 @@ router.post('/', authController.login);                     //Login screen
 router.get('/adminhome', adminAuth, authController.fetchAll);          //Display all users
 router.get('/adminhome/:id', adminAuth,  authController.deleteUser);    //Delete user with this id
 router.post('/adminhome/:id', adminAuth, authController.updateUser);
-
 
 router.post(                                                    //Registration form (accessible only for admin)
     '/signup',
