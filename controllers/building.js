@@ -165,9 +165,12 @@ exports.updateClosure = async (req, res, next) => {
         device
             .on('connect', function () {
                 console.log('MQTT Connesso');
+                var vl = req.body.value;
+                if (vl === 1)
+                    vl = 100;
                 device.publish(
                     "$aws/things/tap" + req.params.shutterId + "/shadow/update",
-                    JSON.stringify({ "state": { "desired": { "posizione": req.body.value } } }),
+                    JSON.stringify({ "state": { "desired": { "posizione": vl } } }),
                     0,
                     function (err) {
                         console.log('Messaggio pubblicato');
